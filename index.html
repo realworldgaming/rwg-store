@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RWG Store — Real World Gaming Marketplace</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Barlow+Condensed:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   RESET & ROOT
+================================================================ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:        #0D0D0D;
+  --panel:     #1A1A1A;
+  --panel2:    #222222;
+  --panel3:    #2A2A2A;
+  --red:       #FF1E1E;
+  --red-dark:  #CC0000;
+  --red-glow:  rgba(255,30,30,0.2);
+  --red-soft:  rgba(255,30,30,0.08);
+  --gold:      #D4AF37;
+  --gold-dim:  rgba(212,175,55,0.15);
+  --gold-glow: rgba(212,175,55,0.25);
+  --white:     #FFFFFF;
+  --grey:      #AAAAAA;
+  --dim:       #555555;
+  --border:    rgba(255,255,255,0.07);
+  --border-r:  rgba(255,30,30,0.25);
+  --border-g:  rgba(212,175,55,0.25);
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Rajdhani',sans-serif;
+  overflow-x:hidden;
+  cursor:none;
+}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--red-dark);}
+
+/* ================================================================
+   CURSOR
+================================================================ */
+.cursor{width:8px;height:8px;background:var(--red);border-radius:50%;position:fixed;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .15s,height .15s;}
+.cursor-ring{width:28px;height:28px;border:1px solid rgba(255,30,30,0.45);border-radius:50%;position:fixed;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);}
+body.hovering .cursor{width:14px;height:14px;}
+body.hovering .cursor-ring{width:44px;height:44px;border-color:var(--gold);}
+
+/* ================================================================
+   INTRO SCREEN
+================================================================ */
+#intro{
+  position:fixed;inset:0;
+  background:#000;
+  z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+/* Energy line */
+.energy-line{
+  position:absolute;
+  top:50%;left:-100%;
+  width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),var(--gold),var(--red),transparent);
+  box-shadow:0 0 20px var(--red),0 0 60px rgba(255,30,30,0.4);
+  animation:energySweep 1.2s .3s cubic-bezier(.4,0,.2,1) forwards;
+  opacity:0;
+}
+@keyframes energySweep{
+  0%{left:-100%;opacity:1;}
+  100%{left:200%;opacity:1;}
+}
+.energy-line-2{
+  position:absolute;
+  top:calc(50% - 20px);left:-100%;
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,0.5),transparent);
+  animation:energySweep 1.2s .5s cubic-bezier(.4,0,.2,1) forwards;
+  opacity:0;
+}
+/* Scan lines */
+.intro-scan{
+  position:absolute;inset:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px);
+  pointer-events:none;opacity:.4;
+}
+/* Grid bg */
+.intro-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,30,30,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,30,30,0.04) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridFade 2s ease forwards;
+}
+@keyframes gridFade{0%{opacity:0;}100%{opacity:1;}}
+
+/* RWG logo reveal */
+.intro-logo-wrap{
+  position:relative;z-index:10;
+  display:flex;flex-direction:column;align-items:center;gap:20px;
+  opacity:0;animation:introLogoIn 1s 1.4s ease forwards;
+}
+@keyframes introLogoIn{from{opacity:0;transform:scale(.9);}to{opacity:1;transform:scale(1);}}
+
+.intro-logo-mark{
+  width:90px;height:90px;
+  background:var(--red);
+  clip-path:polygon(0 0,100% 0,100% 72%,72% 100%,0 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue';font-size:36px;color:#fff;letter-spacing:2px;
+  box-shadow:0 0 40px rgba(255,30,30,0.5);
+  position:relative;
+}
+.intro-logo-mark::after{
+  content:'';position:absolute;inset:-2px;
+  background:linear-gradient(135deg,var(--red),var(--gold));
+  clip-path:polygon(0 0,100% 0,100% 72%,72% 100%,0 100%);
+  z-index:-1;
+}
+.intro-logo-text{
+  font-family:'Bebas Neue';
+  font-size:clamp(70px,14vw,140px);
+  letter-spacing:12px;
+  color:var(--white);
+  text-shadow:0 0 80px rgba(255,30,30,0.4);
+  line-height:1;
+}
+.intro-logo-text .r{color:var(--red);}
+
+.intro-tagline{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  opacity:0;animation:introFadeUp .8s 2.2s ease forwards;
+}
+@keyframes introFadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.intro-tagline-main{
+  font-family:'Barlow Condensed';font-weight:300;
+  font-size:clamp(16px,2.5vw,26px);
+  letter-spacing:10px;color:var(--grey);text-transform:uppercase;
+}
+.intro-tagline-sub{
+  font-family:'JetBrains Mono';font-size:clamp(11px,1.5vw,15px);
+  letter-spacing:5px;color:var(--gold);text-transform:uppercase;
+}
+.intro-dot{color:var(--red);}
+
+/* Intro progress bar */
+.intro-progress{
+  position:absolute;bottom:0;left:0;
+  height:2px;background:linear-gradient(90deg,var(--red),var(--gold));
+  animation:progressLoad 3.8s linear forwards;
+  box-shadow:0 0 10px var(--red);
+}
+@keyframes progressLoad{0%{width:0;}100%{width:100%;}}
+
+/* Fade out overlay */
+#intro.fade-out{animation:introOut .8s ease forwards;}
+@keyframes introOut{to{opacity:0;visibility:hidden;}}
+
+/* ================================================================
+   MAIN WEBSITE
+================================================================ */
+#main{opacity:0;transition:opacity 1s ease;}
+#main.visible{opacity:1;}
+
+/* ================================================================
+   NAVBAR
+================================================================ */
+.navbar{
+  position:fixed;top:0;left:0;right:0;
+  z-index:1000;
+  height:62px;
+  background:rgba(13,13,13,0.95);
+  border-bottom:1px solid var(--border-r);
+  backdrop-filter:blur(20px);
+  display:flex;align-items:center;
+  padding:0 40px;
+  gap:0;
+}
+.nav-logo{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;flex-shrink:0;
+  transition:opacity .2s;
+}
+.nav-logo:hover{opacity:.85;}
+.nav-logo-mark{
+  width:32px;height:32px;
+  background:var(--red);
+  clip-path:polygon(0 0,100% 0,100% 72%,72% 100%,0 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue';font-size:13px;color:#fff;
+}
+.nav-logo-text{font-family:'Bebas Neue';font-size:22px;letter-spacing:3px;color:var(--white);}
+.nav-logo-badge{
+  font-family:'JetBrains Mono';font-size:9px;
+  background:var(--gold);color:#000;font-weight:600;
+  padding:1px 6px;letter-spacing:1px;
+  margin-left:4px;margin-top:-10px;
+}
+
+/* Nav center */
+.nav-center{
+  display:flex;align-items:center;gap:0;
+  position:absolute;left:50%;transform:translateX(-50%);
+}
+.nav-item{
+  display:flex;align-items:center;gap:6px;
+  padding:0 22px;height:62px;
+  color:var(--grey);text-decoration:none;
+  font-family:'Barlow Condensed';font-weight:600;
+  font-size:14px;letter-spacing:2px;text-transform:uppercase;
+  transition:color .2s;position:relative;cursor:pointer;
+  border:none;background:none;
+}
+.nav-item::after{
+  content:'';position:absolute;
+  bottom:0;left:22px;right:22px;
+  height:2px;background:var(--red);
+  transform:scaleX(0);transition:transform .3s ease;
+}
+.nav-item:hover,.nav-item.active{color:var(--white);}
+.nav-item:hover::after,.nav-item.active::after{transform:scaleX(1);}
+.nav-item.active{color:var(--white);}
+
+.nav-soon{
+  font-family:'JetBrains Mono';font-size:8px;
+  background:var(--panel2);color:var(--grey);
+  padding:2px 6px;letter-spacing:1px;
+  border:1px solid var(--border);
+}
+
+/* Nav right */
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-btn-ghost{
+  height:34px;padding:0 16px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--grey);font-family:'Rajdhani';font-weight:600;
+  font-size:13px;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;text-decoration:none;
+  display:flex;align-items:center;
+}
+.nav-btn-ghost:hover{border-color:var(--white);color:var(--white);}
+
+.wallet-btn{
+  height:34px;padding:0 16px;
+  background:linear-gradient(135deg,var(--red),#CC0000);
+  border:none;
+  color:#fff;font-family:'Rajdhani';font-weight:700;
+  font-size:13px;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .25s;
+  display:flex;align-items:center;gap:6px;
+  position:relative;
+}
+.wallet-btn:hover{background:linear-gradient(135deg,#FF3333,var(--red));box-shadow:0 0 20px rgba(255,30,30,0.4);}
+.wallet-dot{width:6px;height:6px;background:#00e676;border-radius:50%;animation:wdot 2s infinite;}
+@keyframes wdot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* Wallet Dropdown */
+.wallet-dropdown{
+  position:absolute;top:100%;right:0;
+  width:220px;
+  background:var(--panel);
+  border:1px solid var(--border-r);
+  border-top:2px solid var(--red);
+  padding:8px 0;
+  display:none;
+  z-index:100;
+  box-shadow:0 20px 60px rgba(0,0,0,0.8);
+}
+.wallet-btn-wrap{position:relative;}
+.wallet-btn-wrap:hover .wallet-dropdown{display:block;}
+.wallet-option{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;
+  font-family:'Rajdhani';font-weight:600;font-size:13px;color:var(--grey);
+  cursor:pointer;transition:all .2s;letter-spacing:.5px;
+  border:none;background:none;width:100%;text-align:left;
+}
+.wallet-option:hover{background:var(--panel2);color:var(--white);padding-left:20px;}
+.wallet-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.wo-soon{margin-left:auto;font-family:'JetBrains Mono';font-size:8px;color:var(--dim);letter-spacing:1px;}
+
+/* Hamburger */
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;margin-left:auto;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--white);transition:all .3s;transform-origin:center;}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* Mobile Menu */
+.mobile-menu{
+  position:fixed;top:62px;left:0;right:0;bottom:0;
+  background:rgba(13,13,13,.98);backdrop-filter:blur(20px);
+  z-index:990;padding:2rem;
+  transform:translateX(100%);transition:transform .4s cubic-bezier(.77,0,.18,1);
+  border-top:1px solid var(--border-r);overflow-y:auto;
+}
+.mobile-menu.open{transform:translateX(0);}
+.mob-link{display:block;font-family:'Bebas Neue';font-size:2.2rem;letter-spacing:.08em;color:var(--grey);text-decoration:none;padding:.6rem 0;border-bottom:1px solid var(--border);transition:color .2s,padding-left .2s;}
+.mob-link:hover{color:var(--red);padding-left:.4rem;}
+.mob-cta{margin-top:1.5rem;background:var(--red);color:#fff!important;text-align:center;padding:1rem!important;border:none!important;display:block;width:100%;font-family:'Bebas Neue';font-size:1.6rem;letter-spacing:.12em;cursor:pointer;}
+
+/* ================================================================
+   HERO
+================================================================ */
+.hero{
+  position:relative;height:100vh;min-height:680px;
+  display:flex;align-items:center;overflow:hidden;
+  padding-top:62px;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse at 70% 50%, rgba(255,30,30,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 30% 80%, rgba(212,175,55,0.04) 0%, transparent 50%),
+    linear-gradient(to bottom, #000 0%, var(--bg) 60%);
+}
+/* Animated grid */
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,30,30,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,30,30,0.05) 1px,transparent 1px);
+  background-size:80px 80px;
+  animation:gridShift 20s linear infinite;
+  mask-image:linear-gradient(to right,transparent,black 20%,black 80%,transparent);
+}
+@keyframes gridShift{from{background-position:0 0;}to{background-position:80px 80px;}}
+
+/* Hero noise */
+.hero-noise{
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.025;pointer-events:none;
+}
+/* Scan line effect */
+.hero::before{
+  content:'';position:absolute;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,30,30,0.6),transparent);
+  animation:heroScan 6s linear infinite;pointer-events:none;z-index:5;
+}
+@keyframes heroScan{0%{top:0;opacity:1;}90%{opacity:1;}100%{top:100%;opacity:0;}}
+
+/* Spotlight */
+.hero-spot{
+  position:absolute;right:10%;top:50%;transform:translateY(-50%);
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,30,30,0.08) 0%,transparent 70%);
+  animation:spotPulse 5s ease-in-out infinite;
+}
+@keyframes spotPulse{0%,100%{transform:translateY(-50%) scale(1);}50%{transform:translateY(-50%) scale(1.15);}}
+
+.hero-content{position:relative;z-index:10;padding:0 80px;max-width:900px;}
+
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:4px 14px;
+  border:1px solid var(--border-r);
+  background:var(--red-soft);
+  font-family:'JetBrains Mono';font-size:10px;
+  letter-spacing:2px;color:var(--red);text-transform:uppercase;
+  margin-bottom:24px;
+  opacity:0;animation:fadeUp .6s .2s forwards;
+}
+.badge-pulse{width:5px;height:5px;background:var(--red);border-radius:50%;animation:wdot 1.5s infinite;}
+
+.hero-title{
+  font-family:'Bebas Neue';
+  font-size:clamp(60px,11vw,130px);
+  letter-spacing:4px;line-height:.88;
+  margin-bottom:12px;
+  opacity:0;animation:fadeUp .8s .4s cubic-bezier(.22,1,.36,1) forwards;
+}
+.hero-title .red{color:var(--red);}
+.hero-title .gold{
+  background:linear-gradient(90deg,var(--gold),#F0D060,var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-title .outline{-webkit-text-stroke:2px rgba(255,255,255,0.4);color:transparent;display:block;}
+
+.hero-sub{
+  font-family:'Barlow Condensed';font-weight:300;
+  font-size:clamp(18px,2.5vw,28px);
+  letter-spacing:8px;color:var(--grey);text-transform:uppercase;
+  margin-bottom:20px;
+  opacity:0;animation:fadeUp .7s .6s forwards;
+}
+.hero-sub span{color:var(--gold);}
+
+.hero-sep{
+  width:50px;height:2px;
+  background:linear-gradient(90deg,var(--red),transparent);
+  margin:22px 0;
+  opacity:0;animation:fadeUp .5s .7s forwards;
+}
+
+.hero-desc{
+  font-size:16px;font-weight:400;
+  color:rgba(255,255,255,.6);line-height:1.8;
+  max-width:500px;margin-bottom:36px;
+  opacity:0;animation:fadeUp .7s .8s forwards;
+}
+.hero-desc strong{color:var(--white);font-weight:600;}
+
+.hero-btns{
+  display:flex;gap:14px;flex-wrap:wrap;
+  opacity:0;animation:fadeUp .7s 1s forwards;
+}
+
+/* Buttons */
+.btn-red{
+  height:52px;padding:0 36px;
+  background:linear-gradient(135deg,var(--red),#CC0000);
+  border:none;color:#fff;
+  font-family:'Barlow Condensed';font-weight:700;
+  font-size:15px;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  position:relative;overflow:hidden;
+}
+.btn-red::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transform:translateX(-100%);transition:transform .5s;}
+.btn-red:hover{box-shadow:0 0 28px rgba(255,30,30,.5);transform:translateY(-2px);}
+.btn-red:hover::after{transform:translateX(100%);}
+.btn-red:active{transform:translateY(0);}
+
+.btn-gold{
+  height:52px;padding:0 36px;
+  background:transparent;
+  border:1px solid var(--gold);
+  color:var(--gold);
+  font-family:'Barlow Condensed';font-weight:700;
+  font-size:15px;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+  position:relative;overflow:hidden;
+}
+.btn-gold::before{content:'';position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .35s ease;z-index:-1;}
+.btn-gold:hover{color:#000;}
+.btn-gold:hover::before{transform:scaleX(1);}
+
+.btn-outline{
+  height:52px;padding:0 36px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--grey);
+  font-family:'Barlow Condensed';font-weight:600;
+  font-size:14px;letter-spacing:3px;text-transform:uppercase;
+  cursor:pointer;transition:all .3s;
+  clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+}
+.btn-outline:hover{border-color:var(--white);color:var(--white);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+/* Hero bottom stats strip */
+.hero-stats-strip{
+  position:absolute;bottom:0;left:0;right:0;
+  height:70px;
+  background:rgba(26,26,26,0.9);
+  backdrop-filter:blur(10px);
+  border-top:1px solid var(--border-r);
+  display:flex;align-items:center;
+  padding:0 80px;gap:0;
+  z-index:10;
+  opacity:0;animation:fadeUp .7s 1.2s forwards;
+}
+.hstat{
+  flex:1;display:flex;flex-direction:column;gap:2px;
+  padding:0 30px;
+  border-right:1px solid var(--border);
+}
+.hstat:first-child{padding-left:0;}
+.hstat:last-child{border-right:none;}
+.hstat-val{font-family:'Bebas Neue';font-size:28px;letter-spacing:2px;color:var(--red);line-height:1;}
+.hstat-val.gold{color:var(--gold);}
+.hstat-key{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+
+/* ================================================================
+   SECTIONS — SHARED
+================================================================ */
+.section{padding:90px 80px;position:relative;}
+.section-alt{background:var(--panel);}
+.section-alt2{background:rgba(26,26,26,.5);}
+
+.section-header{margin-bottom:52px;}
+.eyebrow{
+  display:flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono';font-size:10px;
+  letter-spacing:3px;color:var(--red);text-transform:uppercase;
+  margin-bottom:14px;
+}
+.eyebrow::before{content:'//';color:rgba(255,30,30,.4);}
+
+h2{
+  font-family:'Bebas Neue';
+  font-size:clamp(36px,5vw,60px);
+  letter-spacing:3px;line-height:.95;
+  margin-bottom:10px;
+}
+h2 .red{color:var(--red);}
+h2 .gold{
+  background:linear-gradient(90deg,var(--gold),#F0D060);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+h2 .outline{-webkit-text-stroke:1.5px var(--white);color:transparent;}
+
+.section-line{
+  width:40px;height:2px;
+  background:linear-gradient(90deg,var(--red),transparent);
+  margin:18px 0 22px;
+}
+.section-desc{font-size:15px;color:var(--grey);line-height:1.8;max-width:600px;}
+.section-desc strong{color:var(--white);font-weight:600;}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s cubic-bezier(.22,1,.36,1),transform .65s cubic-bezier(.22,1,.36,1);}
+.reveal.in{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}.d5{transition-delay:.5s;}
+
+/* ================================================================
+   WHY RWG
+================================================================ */
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.why-text .para{font-size:15px;color:var(--grey);line-height:1.85;margin-bottom:14px;}
+.why-text .para strong{color:var(--white);font-weight:600;}
+
+.why-big-text{
+  font-family:'Bebas Neue';
+  font-size:clamp(42px,7vw,80px);
+  letter-spacing:3px;line-height:1;
+  color:var(--white);
+  margin:24px 0;
+}
+.why-big-text span{color:var(--red);}
+
+.why-icons{display:flex;flex-direction:column;gap:20px;}
+.why-icon-item{
+  display:flex;align-items:flex-start;gap:20px;
+  padding:22px 24px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-left:2px solid var(--red);
+  transition:all .25s;cursor:default;
+}
+.why-icon-item:hover{background:var(--panel3);border-left-color:var(--gold);transform:translateX(6px);}
+.why-icon{font-size:28px;flex-shrink:0;line-height:1;}
+.why-icon-content{}
+.why-icon-title{font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:1px;margin-bottom:4px;}
+.why-icon-desc{font-size:13px;color:var(--grey);line-height:1.6;}
+
+/* ================================================================
+   FEATURED GAMES
+================================================================ */
+.games-filter{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:28px;flex-wrap:wrap;
+}
+.filter-chip{
+  height:32px;padding:0 16px;
+  background:var(--panel2);border:1px solid var(--border);
+  color:var(--grey);font-family:'Barlow Condensed';font-weight:600;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+}
+.filter-chip:hover,.filter-chip.active{background:var(--red);border-color:var(--red);color:#fff;}
+
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  gap:10px;
+}
+
+.game-card{
+  position:relative;
+  aspect-ratio:2/3;
+  background:var(--panel2);
+  overflow:hidden;
+  cursor:pointer;
+  transition:transform .3s cubic-bezier(.22,1,.36,1),box-shadow .3s;
+}
+.game-card:hover{transform:translateY(-8px) scale(1.02);box-shadow:0 20px 50px rgba(0,0,0,.8),0 0 20px rgba(255,30,30,.15);}
+.game-card-bg{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:3.5rem;transition:transform .4s ease;
+}
+.game-card:hover .game-card-bg{transform:scale(1.1);}
+.game-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.95) 0%,rgba(0,0,0,.4) 50%,rgba(0,0,0,.1) 100%);
+}
+.game-card-body{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:10px 10px 12px;
+}
+.game-card-title{font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:.5px;line-height:1.2;margin-bottom:4px;}
+.game-card-genre{font-family:'JetBrains Mono';font-size:9px;color:var(--grey);letter-spacing:1px;text-transform:uppercase;}
+.game-card-badges{position:absolute;top:8px;left:8px;display:flex;flex-direction:column;gap:4px;}
+.badge-crypto{background:rgba(212,175,55,.9);color:#000;font-family:'JetBrains Mono';font-size:8px;font-weight:600;padding:2px 6px;letter-spacing:1px;}
+.badge-mining{background:rgba(255,30,30,.9);color:#fff;font-family:'JetBrains Mono';font-size:8px;font-weight:600;padding:2px 6px;letter-spacing:1px;}
+.game-card-glow{
+  position:absolute;inset:0;
+  border:2px solid transparent;
+  transition:border-color .3s;pointer-events:none;
+}
+.game-card:hover .game-card-glow{border-color:rgba(255,30,30,.4);}
+
+/* ================================================================
+   CATEGORIES
+================================================================ */
+.categories-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:12px;
+}
+.cat-card{
+  padding:28px 16px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-bottom:2px solid transparent;
+  text-align:center;
+  cursor:pointer;
+  transition:all .3s;
+  position:relative;overflow:hidden;
+}
+.cat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--red-soft),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.cat-card:hover{border-bottom-color:var(--red);transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.5);}
+.cat-card:hover::before{opacity:1;}
+.cat-card:hover .cat-icon{transform:scale(1.2);}
+.cat-card.active{border-bottom-color:var(--red);background:rgba(255,30,30,.06);}
+.cat-icon{font-size:32px;display:block;margin-bottom:10px;transition:transform .3s;}
+.cat-name{font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--grey);transition:color .2s;}
+.cat-card:hover .cat-name,.cat-card.active .cat-name{color:var(--white);}
+
+/* ================================================================
+   CRYPTO DEALS
+================================================================ */
+.deals-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.deal-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  overflow:hidden;
+  transition:all .3s;
+  position:relative;
+}
+.deal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--red),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.deal-card:hover::before{transform:scaleX(1);}
+.deal-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.deal-cover{height:160px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden;}
+.deal-cover-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8),transparent);}
+.deal-discount{
+  position:absolute;top:12px;right:12px;
+  background:var(--red);color:#fff;
+  font-family:'Bebas Neue';font-size:18px;letter-spacing:1px;
+  padding:4px 10px;
+}
+.deal-body{padding:16px;}
+.deal-title{font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:.5px;margin-bottom:8px;}
+.deal-prices{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.deal-original{font-size:13px;color:var(--dim);text-decoration:line-through;font-family:'JetBrains Mono';}
+.deal-price{font-family:'Bebas Neue';font-size:24px;color:var(--gold);letter-spacing:1px;}
+.deal-cryptos{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;}
+.crypto-tag{font-family:'JetBrains Mono';font-size:9px;font-weight:600;padding:3px 8px;border:1px solid;letter-spacing:1px;}
+.ct-btc{color:#F7931A;border-color:#F7931A;background:rgba(247,147,26,.08);}
+.ct-eth{color:#627EEA;border-color:#627EEA;background:rgba(98,126,234,.08);}
+.ct-usdt{color:#26A17B;border-color:#26A17B;background:rgba(38,161,123,.08);}
+.ct-sol{color:#9945FF;border-color:#9945FF;background:rgba(153,69,255,.08);}
+.ct-rwg{color:var(--red);border-color:var(--red);background:var(--red-soft);}
+.deal-btn{width:100%;height:38px;background:var(--red);border:none;color:#fff;font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+.deal-btn:hover{background:#CC0000;}
+
+/* ================================================================
+   WALLET SECTION
+================================================================ */
+.wallet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:2rem;}
+.wallet-card{
+  padding:36px 28px;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-top:2px solid var(--gold);
+  position:relative;overflow:hidden;
+  transition:all .3s;text-align:center;
+}
+.wallet-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s;}
+.wallet-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.wallet-card:hover::after{opacity:1;}
+.wc-logo{font-size:40px;margin-bottom:18px;display:block;}
+.wc-name{font-family:'Bebas Neue';font-size:26px;letter-spacing:2px;margin-bottom:6px;}
+.wc-desc{font-size:13px;color:var(--grey);margin-bottom:20px;line-height:1.6;}
+.wc-badge{
+  display:inline-block;
+  border:1px solid var(--gold);color:var(--gold);
+  font-family:'JetBrains Mono';font-size:10px;
+  padding:4px 14px;letter-spacing:2px;text-transform:uppercase;
+}
+.wc-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:60px;background:radial-gradient(ellipse,rgba(212,175,55,.1),transparent);pointer-events:none;}
+
+/* ================================================================
+   PROOF OF PLAY
+================================================================ */
+.pop-section{
+  background:linear-gradient(135deg,#0A0A0A 0%,#111 50%,#0D0808 100%);
+  border-top:1px solid var(--border-r);
+  border-bottom:1px solid var(--border-r);
+  position:relative;overflow:hidden;
+}
+.pop-bg-glow{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:800px;height:500px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,30,30,.05),transparent);
+  pointer-events:none;
+}
+.pop-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.pop-steps{display:flex;flex-direction:column;gap:16px;}
+.pop-step{
+  display:flex;align-items:center;gap:20px;
+  padding:20px 24px;
+  background:rgba(255,30,30,.04);
+  border:1px solid var(--border-r);
+  transition:all .3s;cursor:default;
+}
+.pop-step:hover{background:rgba(255,30,30,.08);transform:translateX(8px);}
+.pop-step-num{
+  font-family:'Bebas Neue';font-size:36px;color:rgba(255,30,30,.2);line-height:1;flex-shrink:0;min-width:40px;transition:color .3s;
+}
+.pop-step:hover .pop-step-num{color:rgba(255,30,30,.6);}
+.pop-step-icon{font-size:22px;flex-shrink:0;}
+.pop-step-content{}
+.pop-step-title{font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:1px;margin-bottom:3px;}
+.pop-step-desc{font-size:12px;color:var(--grey);line-height:1.5;}
+
+/* Mining visual */
+.mining-visual{
+  background:var(--panel);
+  border:1px solid var(--border-r);
+  border-top:2px solid var(--red);
+  padding:28px;
+}
+.mv-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.mv-live{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:#00e676;text-transform:uppercase;}
+.mv-live-dot{width:6px;height:6px;background:#00e676;border-radius:50%;animation:wdot 1.5s infinite;}
+.mv-title{font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase;}
+
+.mining-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.m-stat{background:var(--panel2);padding:14px 16px;}
+.m-stat-val{font-family:'Bebas Neue';font-size:28px;color:var(--red);letter-spacing:1px;}
+.m-stat-label{font-family:'JetBrains Mono';font-size:9px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;}
+
+.mine-bar-row{margin-bottom:12px;}
+.mine-bar-label{display:flex;justify-content:space-between;font-family:'JetBrains Mono';font-size:10px;color:var(--grey);margin-bottom:6px;}
+.mine-bar-track{height:6px;background:var(--panel2);border:1px solid var(--border);overflow:hidden;}
+.mine-bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));position:relative;}
+.mine-bar-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 6px #fff;}
+
+/* ================================================================
+   COMMUNITY
+================================================================ */
+.community-posts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.community-post{
+  background:var(--panel2);border:1px solid var(--border);
+  padding:20px;transition:all .3s;
+}
+.community-post:hover{border-color:var(--border-r);background:var(--panel3);}
+.cp-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.cp-avatar{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+}
+.cp-name{font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:.5px;}
+.cp-game{font-family:'JetBrains Mono';font-size:9px;color:var(--red);letter-spacing:1px;text-transform:uppercase;}
+.cp-text{font-size:14px;color:var(--grey);line-height:1.6;margin-bottom:12px;}
+.cp-footer{display:flex;align-items:center;justify-content:space-between;}
+.cp-reward{font-family:'Bebas Neue';font-size:18px;color:var(--gold);letter-spacing:1px;}
+.cp-time{font-family:'JetBrains Mono';font-size:9px;color:var(--dim);letter-spacing:1px;}
+
+.streaming-banner{
+  margin-top:24px;
+  padding:20px 28px;
+  background:linear-gradient(90deg,rgba(255,30,30,.06),rgba(212,175,55,.06));
+  border:1px solid var(--border-r);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:16px;
+}
+.streaming-text{font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:2px;color:var(--grey);text-transform:uppercase;}
+.streaming-badge{
+  border:1px solid var(--gold);color:var(--gold);
+  font-family:'JetBrains Mono';font-size:11px;
+  padding:6px 16px;letter-spacing:2px;text-transform:uppercase;
+  animation:badgePulse 2s ease-in-out infinite;
+}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.4);}50%{box-shadow:0 0 0 6px rgba(212,175,55,0);}}
+
+/* ================================================================
+   PHASES
+================================================================ */
+.phases-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.phase-card{
+  padding:36px 28px;
+  background:var(--panel2);border:1px solid var(--border);
+  position:relative;overflow:hidden;transition:all .3s;
+}
+.phase-card.active{border-color:var(--border-r);background:rgba(255,30,30,.04);}
+.phase-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.6);}
+.phase-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--red);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.phase-card:hover::before,.phase-card.active::before{transform:scaleX(1);}
+.pc-num{font-family:'Bebas Neue';font-size:80px;color:rgba(255,30,30,.06);line-height:1;position:absolute;right:20px;bottom:10px;letter-spacing:2px;transition:color .3s;}
+.phase-card:hover .pc-num{color:rgba(255,30,30,.12);}
+.pc-label{font-family:'JetBrains Mono';font-size:9px;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:10px;}
+.pc-title{font-family:'Bebas Neue';font-size:32px;letter-spacing:2px;margin-bottom:16px;transition:color .3s;}
+.phase-card:hover .pc-title{color:var(--red);}
+.pc-features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.pc-feature{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--grey);}
+.pc-feature::before{content:'';width:4px;height:4px;background:var(--red);flex-shrink:0;clip-path:polygon(50% 0,100% 100%,0 100%);}
+.pc-status{
+  display:inline-block;
+  font-family:'JetBrains Mono';font-size:9px;font-weight:600;
+  padding:4px 12px;letter-spacing:2px;text-transform:uppercase;
+}
+.status-active{background:var(--red);color:#fff;}
+.status-soon{border:1px solid var(--border);color:var(--dim);}
+
+/* ================================================================
+   ROADMAP
+================================================================ */
+.roadmap-section{background:var(--panel);}
+.roadmap-line{
+  position:relative;
+  padding:0 80px;
+  margin-top:3rem;
+}
+.roadmap-line::before{
+  content:'';position:absolute;
+  left:80px;right:80px;top:20px;
+  height:1px;background:linear-gradient(90deg,var(--red),var(--gold),rgba(255,30,30,.2));
+}
+.roadmap-items{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;position:relative;z-index:1;
+}
+.rm-item{padding:0 20px 0 0;padding-top:50px;position:relative;}
+.rm-dot{
+  position:absolute;top:14px;left:0;
+  width:12px;height:12px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--red-dark);
+  transition:all .3s;
+}
+.rm-item:hover .rm-dot{background:var(--red);border-color:var(--red);box-shadow:0 0 12px rgba(255,30,30,.6);}
+.rm-year{font-family:'Bebas Neue';font-size:48px;color:rgba(255,30,30,.15);letter-spacing:2px;line-height:1;margin-bottom:6px;transition:color .3s;}
+.rm-item:hover .rm-year{color:rgba(255,30,30,.4);}
+.rm-title{font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:1px;color:var(--white);margin-bottom:4px;}
+.rm-desc{font-size:12px;color:var(--grey);line-height:1.6;}
+
+/* ================================================================
+   FOOTER
+================================================================ */
+footer{
+  background:#080808;
+  border-top:1px solid var(--border);
+  padding:60px 80px 30px;
+}
+.footer-top{
+  display:grid;grid-template-columns:1.5fr repeat(3,1fr);
+  gap:60px;padding-bottom:48px;border-bottom:1px solid var(--border);
+}
+.footer-brand{}
+.footer-logo-wrap{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.footer-logo-mark{width:36px;height:36px;background:var(--red);clip-path:polygon(0 0,100% 0,100% 72%,72% 100%,0 100%);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue';font-size:14px;color:#fff;}
+.footer-logo-text{font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;}
+.footer-desc{font-size:13px;color:var(--grey);line-height:1.75;max-width:280px;}
+.footer-socials{display:flex;gap:10px;margin-top:20px;}
+.fsoc{
+  width:36px;height:36px;
+  background:var(--panel2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;text-decoration:none;
+  transition:all .2s;
+}
+.fsoc:hover{border-color:var(--red);background:rgba(255,30,30,.1);}
+.footer-col-title{font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--white);margin-bottom:18px;}
+.footer-links{display:flex;flex-direction:column;gap:8px;}
+.footer-link{font-size:13px;color:var(--grey);text-decoration:none;transition:color .2s;letter-spacing:.3px;}
+.footer-link:hover{color:var(--red);}
+.footer-bottom{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:12px;padding-top:24px;
+}
+.footer-copy{font-size:12px;color:var(--dim);letter-spacing:.5px;}
+.footer-token{font-family:'JetBrains Mono';font-size:11px;color:rgba(212,175,55,.4);letter-spacing:1px;}
+.footer-rwg{font-family:'Bebas Neue';font-size:14px;letter-spacing:3px;color:var(--dim);}
+.footer-rwg span{color:var(--red);}
+
+/* ================================================================
+   SECTION DIVIDER
+================================================================ */
+.section-divider{
+  height:1px;background:linear-gradient(90deg,transparent,var(--border-r),transparent);
+}
+
+/* ================================================================
+   TICKER STRIP
+================================================================ */
+.ticker{
+  background:rgba(255,30,30,.06);
+  border-top:1px solid var(--border-r);border-bottom:1px solid var(--border-r);
+  overflow:hidden;padding:10px 0;display:flex;
+}
+.ticker-lbl{background:var(--red);padding:0 18px;font-family:'Bebas Neue';font-size:.9rem;letter-spacing:.18em;display:flex;align-items:center;flex-shrink:0;white-space:nowrap;font-size:13px;}
+.ticker-inner{display:inline-flex;gap:3rem;white-space:nowrap;animation:tickScroll 32s linear infinite;font-family:'JetBrains Mono';font-size:.65rem;letter-spacing:.12em;color:var(--grey);text-transform:uppercase;}
+.ticker-inner .ts{color:var(--red);}
+@keyframes tickScroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ================================================================
+   GLASS PANELS (special)
+================================================================ */
+.glass{
+  background:rgba(255,255,255,.03);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.06);
+}
+
+/* ================================================================
+   RESPONSIVE
+================================================================ */
+@media(max-width:1200px){
+  .games-grid{grid-template-columns:repeat(6,1fr);}
+  .categories-grid{grid-template-columns:repeat(4,1fr);}
+  .footer-top{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:900px){
+  .section{padding:60px 24px;}
+  .hero-content{padding:0 24px;}
+  .hero-stats-strip{padding:0 24px;}
+  .hstat{padding:0 16px;}
+  .nav-center{display:none;}
+  .nav-right{display:none;}
+  .hamburger{display:flex;}
+  .why-grid{grid-template-columns:1fr;}
+  .games-grid{grid-template-columns:repeat(4,1fr);}
+  .categories-grid{grid-template-columns:repeat(3,1fr);}
+  .deals-grid{grid-template-columns:repeat(2,1fr);}
+  .wallet-grid{grid-template-columns:1fr;}
+  .pop-layout{grid-template-columns:1fr;}
+  .community-posts{grid-template-columns:1fr;}
+  .phases-grid{grid-template-columns:1fr;}
+  .roadmap-items{grid-template-columns:repeat(2,1fr);}
+  .footer-top{grid-template-columns:1fr;}
+  footer{padding:40px 24px 24px;}
+  .roadmap-line{padding:0;}
+  .roadmap-line::before{left:0;right:0;}
+}
+@media(max-width:600px){
+  .games-grid{grid-template-columns:repeat(3,1fr);}
+  .categories-grid{grid-template-columns:repeat(2,1fr);}
+  .deals-grid{grid-template-columns:1fr;}
+  .hero-btns{flex-direction:column;}
+  .hero-stats-strip{display:none;}
+  h2{font-size:2rem;}
+  .roadmap-items{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- ================================================================
+     INTRO SCREEN
+================================================================ -->
+<div id="intro">
+  <div class="intro-grid"></div>
+  <div class="intro-scan"></div>
+  <div class="energy-line"></div>
+  <div class="energy-line-2"></div>
+
+  <div class="intro-logo-wrap">
+    <div class="intro-logo-mark">R</div>
+    <div class="intro-logo-text">RW<span class="r">G</span></div>
+    <div class="intro-tagline">
+      <div class="intro-tagline-main">REAL WORLD GAMING</div>
+      <div class="intro-tagline-sub">Play <span class="intro-dot">•</span> Own <span class="intro-dot">•</span> Earn</div>
+    </div>
+  </div>
+
+  <div class="intro-progress"></div>
+</div>
+
+<!-- ================================================================
+     MAIN SITE
+================================================================ -->
+<div id="main">
+
+<!-- NAVBAR -->
+<nav class="navbar" id="mainNav">
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark">R</div>
+    <span class="nav-logo-text">RWG</span>
+    <span class="nav-logo-badge">STORE</span>
+  </a>
+
+  <div class="nav-center">
+    <a href="#" class="nav-item active">Store</a>
+    <div class="nav-item" style="cursor:default;">
+      Launcher <span class="nav-soon">SOON</span>
+    </div>
+    <div class="nav-item" style="cursor:default;">
+      Studio <span class="nav-soon">SOON</span>
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <a href="#" class="nav-btn-ghost">Login</a>
+    <a href="#" class="nav-btn-ghost">Sign Up</a>
+    <div class="wallet-btn-wrap">
+      <button class="wallet-btn">
+        <div class="wallet-dot"></div>
+        Connect Wallet ▾
+      </button>
+      <div class="wallet-dropdown">
+        <div class="wallet-option">
+          <div class="wallet-icon" style="background:#F6851B;">🦊</div>
+          <span>MetaMask</span>
+          <span class="wo-soon">SOON</span>
+        </div>
+        <div class="wallet-option">
+          <div class="wallet-icon" style="background:#3375BB;">🛡</div>
+          <span>Trust Wallet</span>
+          <span class="wo-soon">SOON</span>
+        </div>
+        <div class="wallet-option">
+          <div class="wallet-icon" style="background:var(--red);">R</div>
+          <span>RWG Wallet</span>
+          <span class="wo-soon">SOON</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" class="mob-link" onclick="closeMenu()">Store</a>
+  <a href="#games" class="mob-link" onclick="closeMenu()">Browse Games</a>
+  <a href="#deals" class="mob-link" onclick="closeMenu()">Crypto Deals</a>
+  <a href="#pop" class="mob-link" onclick="closeMenu()">Proof of Play</a>
+  <a href="#phases" class="mob-link" onclick="closeMenu()">Phases</a>
+  <button class="mob-cta" onclick="closeMenu()">Connect Wallet</button>
+</div>
+
+<!-- ================================================================
+     HERO
+================================================================ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-spot"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge"><div class="badge-pulse"></div>Now Live — Beta Access Open</div>
+    <h1 class="hero-title">
+      RWG<br>
+      <span class="gold">STORE</span>
+      <span class="outline">PLAY</span>
+    </h1>
+    <div class="hero-sub">The Future Game <span>Marketplace</span></div>
+    <div class="hero-sep"></div>
+    <p class="hero-desc">
+      Buy games with crypto or fiat. <strong>True on-chain ownership.</strong> Every purchase is yours — permanently, provably, on the blockchain.
+    </p>
+    <div class="hero-btns">
+      <button class="btn-red" onclick="document.getElementById('games').scrollIntoView({behavior:'smooth'})">Browse Games</button>
+      <button class="btn-gold" onclick="document.getElementById('why').scrollIntoView({behavior:'smooth'})">Explore RWG</button>
+    </div>
+  </div>
+
+  <div class="hero-stats-strip">
+    <div class="hstat"><div class="hstat-val">44+</div><div class="hstat-key">Games Available</div></div>
+    <div class="hstat"><div class="hstat-val gold">$200B</div><div class="hstat-key">Gaming Market</div></div>
+    <div class="hstat"><div class="hstat-val">5</div><div class="hstat-key">Crypto Accepted</div></div>
+    <div class="hstat"><div class="hstat-val gold">100%</div><div class="hstat-key">On-Chain Ownership</div></div>
+    <div class="hstat"><div class="hstat-val">786M</div><div class="hstat-key">RWG Supply</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-lbl">RWG LIVE</div>
+  <div style="overflow:hidden;flex:1;padding:0 20px;">
+    <div class="ticker-inner">
+      <span>RWG Store</span><span class="ts">◆</span><span>Proof of Play</span><span class="ts">◆</span><span>True Ownership</span><span class="ts">◆</span><span>Play &amp; Earn</span><span class="ts">◆</span><span>786M Token Supply</span><span class="ts">◆</span><span>BTC Accepted</span><span class="ts">◆</span><span>ETH Accepted</span><span class="ts">◆</span><span>SOL Accepted</span><span class="ts">◆</span><span>RWG Token</span><span class="ts">◆</span><span>Crypto Discounts</span><span class="ts">◆</span><span>3-Year Halving</span><span class="ts">◆</span><span>100-Year Mining</span><span class="ts">◆</span>
+      <span>RWG Store</span><span class="ts">◆</span><span>Proof of Play</span><span class="ts">◆</span><span>True Ownership</span><span class="ts">◆</span><span>Play &amp; Earn</span><span class="ts">◆</span><span>786M Token Supply</span><span class="ts">◆</span><span>BTC Accepted</span><span class="ts">◆</span><span>ETH Accepted</span><span class="ts">◆</span><span>SOL Accepted</span><span class="ts">◆</span><span>RWG Token</span><span class="ts">◆</span><span>Crypto Discounts</span><span class="ts">◆</span><span>3-Year Halving</span><span class="ts">◆</span><span>100-Year Mining</span><span class="ts">◆</span>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     WHY RWG
+================================================================ -->
+<section class="section" id="why">
+  <div class="why-grid">
+    <div class="reveal">
+      <div class="section-header">
+        <div class="eyebrow">Why We Exist</div>
+        <h2>Why Real World<br><span class="red">Gaming</span> Exists</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="why-big-text">GAMERS GIVE.<br><span>NOTHING RETURNS.</span></div>
+      <div class="why-text">
+        <p class="para">Gamers spend <strong>thousands of hours</strong> playing. Money flows into games. Into developers. Into platforms. Into shareholders.</p>
+        <p class="para"><strong>But nothing comes back.</strong> Not to the player who put in 2,000 hours. Not to the skilled competitor who dominates the leaderboard. Not to anyone who actually made the game worth playing.</p>
+        <p class="para">RWG changes that permanently — through <strong>Proof of Play</strong>. Your time, skill and activity become real economic value on the blockchain.</p>
+      </div>
+    </div>
+    <div class="reveal d2">
+      <div class="why-icons">
+        <div class="why-icon-item">
+          <div class="why-icon">⏱️</div>
+          <div class="why-icon-content">
+            <div class="why-icon-title">Time Played</div>
+            <div class="why-icon-desc">8 billion hours of gameplay happen daily. Every hour should generate value for the player — not just the platform. RWG tracks every session.</div>
+          </div>
+        </div>
+        <div class="why-icon-item">
+          <div class="why-icon">🏆</div>
+          <div class="why-icon-content">
+            <div class="why-icon-title">Skill Rewarded</div>
+            <div class="why-icon-desc">Better players earn more. Skill directly drives token rewards. No random drops, no pay-to-win — pure merit-based distribution that actually works.</div>
+          </div>
+        </div>
+        <div class="why-icon-item">
+          <div class="why-icon">💰</div>
+          <div class="why-icon-content">
+            <div class="why-icon-title">Real Rewards</div>
+            <div class="why-icon-desc">RWG tokens with real deflationary economics. 786M total supply. 3-year halving. 100-year mining duration. Earned through play, not purchased.</div>
+          </div>
+        </div>
+        <div class="why-icon-item">
+          <div class="why-icon">🔗</div>
+          <div class="why-icon-content">
+            <div class="why-icon-title">True Ownership</div>
+            <div class="why-icon-desc">Every game you buy is stored on-chain permanently. No platform can revoke it. No shutdown can erase it. Your library is truly, provably yours.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     GAME CATEGORIES
+================================================================ -->
+<section class="section section-alt" id="categories">
+  <div class="section-header reveal">
+    <div class="eyebrow">Browse By Category</div>
+    <h2>Game <span class="gold">Categories</span></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="categories-grid">
+    <div class="cat-card reveal active" onclick="filterGames('all',this)"><span class="cat-icon">🎮</span><span class="cat-name">All Games</span></div>
+    <div class="cat-card reveal d1" onclick="filterGames('action',this)"><span class="cat-icon">💥</span><span class="cat-name">Action</span></div>
+    <div class="cat-card reveal d1" onclick="filterGames('adventure',this)"><span class="cat-icon">🗺️</span><span class="cat-name">Adventure</span></div>
+    <div class="cat-card reveal d2" onclick="filterGames('rpg',this)"><span class="cat-icon">⚔️</span><span class="cat-name">RPG</span></div>
+    <div class="cat-card reveal d2" onclick="filterGames('shooter',this)"><span class="cat-icon">🎯</span><span class="cat-name">Shooter</span></div>
+    <div class="cat-card reveal d3" onclick="filterGames('racing',this)"><span class="cat-icon">🏎️</span><span class="cat-name">Racing</span></div>
+    <div class="cat-card reveal d3" onclick="filterGames('sports',this)"><span class="cat-icon">⚽</span><span class="cat-name">Sports</span></div>
+    <div class="cat-card reveal d4" onclick="filterGames('strategy',this)"><span class="cat-icon">♟️</span><span class="cat-name">Strategy</span></div>
+    <div class="cat-card reveal d4" onclick="filterGames('simulation',this)"><span class="cat-icon">🌍</span><span class="cat-name">Simulation</span></div>
+    <div class="cat-card reveal d5" onclick="filterGames('horror',this)"><span class="cat-icon">👻</span><span class="cat-name">Horror</span></div>
+    <div class="cat-card reveal d5" onclick="filterGames('openworld',this)"><span class="cat-icon">🌐</span><span class="cat-name">Open World</span></div>
+    <div class="cat-card reveal" onclick="filterGames('battle-royale',this)"><span class="cat-icon">🔫</span><span class="cat-name">Battle Royale</span></div>
+    <div class="cat-card reveal d1" onclick="filterGames('mmorpg',this)"><span class="cat-icon">🐉</span><span class="cat-name">MMORPG</span></div>
+    <div class="cat-card reveal d1" onclick="filterGames('fighting',this)"><span class="cat-icon">🥊</span><span class="cat-name">Fighting</span></div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FEATURED GAMES
+================================================================ -->
+<section class="section" id="games">
+  <div class="section-header">
+    <div class="eyebrow">Game Library</div>
+    <h2>Featured <span class="red">Games</span></h2>
+    <div class="section-line"></div>
+    <div class="games-filter">
+      <span style="font-family:'JetBrains Mono';font-size:10px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;margin-right:4px;">SORT:</span>
+      <button class="filter-chip active">All</button>
+      <button class="filter-chip">New</button>
+      <button class="filter-chip">Popular</button>
+      <button class="filter-chip">Crypto Deal</button>
+      <button class="filter-chip">Mining Ready</button>
+      <button class="filter-chip">Free to Play</button>
+    </div>
+  </div>
+
+  <div class="games-grid" id="gamesGrid">
+    <!-- 44 game cards -->
+  </div>
+</section>
+
+<!-- ================================================================
+     CRYPTO DEALS
+================================================================ -->
+<section class="section section-alt" id="deals">
+  <div class="section-header reveal">
+    <div class="eyebrow">Limited Offers</div>
+    <h2>Crypto <span class="gold">Deals</span></h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Pay with crypto and save up to 50%. <strong>RWG token holders get an additional 15% discount</strong> on every purchase automatically.</p>
+  </div>
+  <div class="deals-grid" id="dealsGrid"></div>
+</section>
+
+<!-- ================================================================
+     WALLET SECTION
+================================================================ -->
+<section class="section" id="wallet">
+  <div class="section-header reveal">
+    <div class="eyebrow">Web3 Integration</div>
+    <h2>RWG Wallet <span class="gold">Integration</span></h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Connect your wallet to access crypto payments, on-chain ownership, and automatic RWG token rewards.</p>
+  </div>
+  <div class="wallet-grid">
+    <div class="wallet-card reveal">
+      <div class="wc-glow"></div>
+      <div class="wc-logo">🦊</div>
+      <div class="wc-name">MetaMask</div>
+      <div class="wc-desc">The world's leading Web3 wallet. Connect seamlessly to purchase games and manage your RWG assets on desktop and mobile.</div>
+      <div class="wc-badge">Coming Soon</div>
+    </div>
+    <div class="wallet-card reveal d2">
+      <div class="wc-glow"></div>
+      <div class="wc-logo">🛡</div>
+      <div class="wc-name">Trust Wallet</div>
+      <div class="wc-desc">Full mobile wallet support. Take your RWG game library and token balance with you anywhere, on any device.</div>
+      <div class="wc-badge">Coming Soon</div>
+    </div>
+    <div class="wallet-card reveal d3">
+      <div class="wc-glow"></div>
+      <div class="wc-logo" style="color:var(--red);font-size:36px;font-family:'Bebas Neue';font-weight:900;">RWG</div>
+      <div class="wc-name">RWG Wallet</div>
+      <div class="wc-desc">Built specifically for gamers. Native RWG token support, in-game asset management, mining rewards dashboard — all in one place.</div>
+      <div class="wc-badge" style="border-color:var(--red);color:var(--red);">Coming Soon</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PROOF OF PLAY
+================================================================ -->
+<section class="section pop-section" id="pop">
+  <div class="pop-bg-glow"></div>
+  <div class="pop-layout">
+    <div class="reveal">
+      <div class="section-header">
+        <div class="eyebrow">The Protocol</div>
+        <h2>Proof Of <span class="red">Play</span></h2>
+        <div class="section-line"></div>
+        <p class="section-desc">Mining RWG tokens by playing games. Your skill, activity and wins replace electricity and hardware. <strong>Zero additional cost. Maximum reward.</strong></p>
+      </div>
+      <div class="pop-steps">
+        <div class="pop-step reveal">
+          <div class="pop-step-num">01</div>
+          <div class="pop-step-icon">🎮</div>
+          <div class="pop-step-content">
+            <div class="pop-step-title">Play Any Supported Game</div>
+            <div class="pop-step-desc">Launch any game through the RWG Launcher. Activity tracking starts automatically.</div>
+          </div>
+        </div>
+        <div class="pop-step reveal d1">
+          <div class="pop-step-num">02</div>
+          <div class="pop-step-icon">🤖</div>
+          <div class="pop-step-content">
+            <div class="pop-step-title">AI Verification Engine</div>
+            <div class="pop-step-desc">Our AI anti-cheat confirms real human gameplay. No bots. No exploits. Pure activity.</div>
+          </div>
+        </div>
+        <div class="pop-step reveal d2">
+          <div class="pop-step-num">03</div>
+          <div class="pop-step-icon">⛏️</div>
+          <div class="pop-step-content">
+            <div class="pop-step-title">Mining Block Calculated</div>
+            <div class="pop-step-desc">Skill, wins, activity and community contribution combine to determine your reward.</div>
+          </div>
+        </div>
+        <div class="pop-step reveal d3" style="background:rgba(255,30,30,.06);border-left-color:var(--gold);">
+          <div class="pop-step-num" style="color:rgba(212,175,55,.4);">04</div>
+          <div class="pop-step-icon">💰</div>
+          <div class="pop-step-content">
+            <div class="pop-step-title">RWG Tokens Distributed</div>
+            <div class="pop-step-desc">Tokens sent directly to your wallet. Halving every 3 years — early miners earn most.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal d2">
+      <div class="mining-visual">
+        <div class="mv-header">
+          <div class="mv-live"><div class="mv-live-dot"></div>Mining Active</div>
+          <div class="mv-title">Live Dashboard</div>
+        </div>
+        <div class="mining-stat-grid">
+          <div class="m-stat"><div class="m-stat-val">3.2</div><div class="m-stat-label">RWG / Session</div></div>
+          <div class="m-stat"><div class="m-stat-val" style="color:var(--gold);">47min</div><div class="m-stat-label">Session Time</div></div>
+          <div class="m-stat"><div class="m-stat-val">18</div><div class="m-stat-label">Kills This Match</div></div>
+          <div class="m-stat"><div class="m-stat-val" style="color:var(--gold);">#4</div><div class="m-stat-label">Leaderboard</div></div>
+        </div>
+        <div class="mine-bar-row">
+          <div class="mine-bar-label"><span>Block Progress</span><span style="color:var(--red);">68%</span></div>
+          <div class="mine-bar-track"><div class="mine-bar-fill" style="width:68%;"></div></div>
+        </div>
+        <div class="mine-bar-row">
+          <div class="mine-bar-label"><span>Skill Multiplier</span><span style="color:var(--gold);">1.4×</span></div>
+          <div class="mine-bar-track"><div class="mine-bar-fill" style="width:84%;background:linear-gradient(90deg,var(--gold),#F0D060);"></div></div>
+        </div>
+        <div class="mine-bar-row">
+          <div class="mine-bar-label"><span>Community Bonus</span><span style="color:var(--white);">+0.6 RWG</span></div>
+          <div class="mine-bar-track"><div class="mine-bar-fill" style="width:42%;"></div></div>
+        </div>
+        <div style="margin-top:18px;padding:14px;background:var(--panel2);border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-family:'JetBrains Mono';font-size:10px;color:var(--grey);letter-spacing:1px;">TOTAL EARNED TODAY</div>
+          <div style="font-family:'Bebas Neue';font-size:32px;color:var(--red);letter-spacing:2px;">12.8 RWG</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     COMMUNITY
+================================================================ -->
+<section class="section section-alt" id="community">
+  <div class="section-header reveal">
+    <div class="eyebrow">Player Network</div>
+    <h2>Gaming <span class="gold">Community</span></h2>
+    <div class="section-line"></div>
+    <p class="section-desc">Join thousands of gamers sharing wins, strategies and rewards across the RWG ecosystem.</p>
+  </div>
+  <div class="community-posts" id="communityPosts"></div>
+  <div class="streaming-banner reveal">
+    <div>
+      <div class="streaming-text">🎥 Live Streaming Integration</div>
+      <div style="font-size:13px;color:var(--grey);margin-top:4px;">Watch community members play, earn together, and broadcast their mining sessions live</div>
+    </div>
+    <div class="streaming-badge">Streaming Coming Soon</div>
+  </div>
+</section>
+
+<!-- ================================================================
+     PHASES
+================================================================ -->
+<section class="section" id="phases">
+  <div class="section-header reveal">
+    <div class="eyebrow">The Ecosystem</div>
+    <h2>Three Phases. <span class="red">One</span> Future.</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="phases-grid">
+    <div class="phase-card active reveal">
+      <div class="pc-num">1</div>
+      <div class="pc-label">// Phase 01</div>
+      <div class="pc-title">RWG STORE</div>
+      <div class="pc-features">
+        <div class="pc-feature">Game Marketplace</div>
+        <div class="pc-feature">Crypto + Fiat Payments</div>
+        <div class="pc-feature">True On-Chain Ownership</div>
+        <div class="pc-feature">Game Communities</div>
+        <div class="pc-feature">RWG Token Discounts</div>
+      </div>
+      <span class="pc-status status-active">Live Now</span>
+    </div>
+    <div class="phase-card reveal d2">
+      <div class="pc-num">2</div>
+      <div class="pc-label">// Phase 02</div>
+      <div class="pc-title">RWG LAUNCHER</div>
+      <div class="pc-features">
+        <div class="pc-feature">Proof of Play Mining</div>
+        <div class="pc-feature">AI Activity Verification</div>
+        <div class="pc-feature">Subscription Model</div>
+        <div class="pc-feature">Community Mining Pools</div>
+        <div class="pc-feature">Skill-Based Rewards</div>
+      </div>
+      <span class="pc-status status-soon">Coming Soon</span>
+    </div>
+    <div class="phase-card reveal d3">
+      <div class="pc-num">3</div>
+      <div class="pc-label">// Phase 03</div>
+      <div class="pc-title">RWG STUDIO</div>
+      <div class="pc-features">
+        <div class="pc-feature">AAA Game Development</div>
+        <div class="pc-feature">100-Player Lobbies</div>
+        <div class="pc-feature">NFT Game Economy</div>
+        <div class="pc-feature">Personal Player Spaces</div>
+        <div class="pc-feature">Next Gen Gaming</div>
+      </div>
+      <span class="pc-status status-soon">Coming Soon</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     ROADMAP
+================================================================ -->
+<section class="section roadmap-section" id="roadmap">
+  <div class="section-header reveal">
+    <div class="eyebrow">Timeline</div>
+    <h2>Roadmap <span class="red">Preview</span></h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="roadmap-line reveal">
+    <div class="roadmap-items">
+      <div class="rm-item">
+        <div class="rm-dot" style="background:var(--red);border-color:var(--red);box-shadow:0 0 10px rgba(255,30,30,.5);"></div>
+        <div class="rm-year">2025</div>
+        <div class="rm-title">RWG Store Launch</div>
+        <div class="rm-desc">Full marketplace live with crypto and fiat payments, on-chain ownership, and community features.</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot"></div>
+        <div class="rm-year">2026</div>
+        <div class="rm-title">RWG Launcher Beta</div>
+        <div class="rm-desc">Proof-of-Play protocol launches. First players begin mining RWG tokens through gameplay.</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot"></div>
+        <div class="rm-year">2027</div>
+        <div class="rm-title">Full PoP Mining</div>
+        <div class="rm-desc">Community mining pools active. Skill multipliers live. Exchange listings for RWG token.</div>
+      </div>
+      <div class="rm-item">
+        <div class="rm-dot"></div>
+        <div class="rm-year">2028</div>
+        <div class="rm-title">RWG Studio Begins</div>
+        <div class="rm-desc">First AAA RWG-native title begins development. 100-player lobbies. Full NFT economy.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo-wrap">
+        <div class="footer-logo-mark">R</div>
+        <span class="footer-logo-text">RWG</span>
+      </div>
+      <p class="footer-desc">Real World Gaming is building the future where gamers are rewarded for playing. True ownership. Real rewards. The economy finally works for the player.</p>
+      <div class="footer-socials">
+        <a class="fsoc" href="https://x.com/RWG__official" target="_blank">✕</a>
+        <a class="fsoc" href="https://discord.gg/ay9b9vU5b" target="_blank">🎮</a>
+        <a class="fsoc" href="https://www.linkedin.com/company/real-world-gaming/" target="_blank">💼</a>
+        <a class="fsoc" href="mailto:skjainuddin12345@gmail.com">✉</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Store</div>
+      <div class="footer-links">
+        <a href="#games" class="footer-link">Browse Games</a>
+        <a href="#deals" class="footer-link">Crypto Deals</a>
+        <a href="#categories" class="footer-link">Categories</a>
+        <a href="#wallet" class="footer-link">Wallet Connect</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Ecosystem</div>
+      <div class="footer-links">
+        <a href="#pop" class="footer-link">Proof of Play</a>
+        <a href="#phases" class="footer-link">RWG Phases</a>
+        <a href="#roadmap" class="footer-link">Roadmap</a>
+        <a href="#community" class="footer-link">Community</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Connect</div>
+      <div class="footer-links">
+        <a href="https://x.com/RWG__official" class="footer-link" target="_blank">Twitter / X</a>
+        <a href="https://discord.gg/ay9b9vU5b" class="footer-link" target="_blank">Discord</a>
+        <a href="https://www.linkedin.com/company/real-world-gaming/" class="footer-link" target="_blank">LinkedIn</a>
+        <a href="mailto:skjainuddin12345@gmail.com" class="footer-link">Contact</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Real World Gaming. All rights reserved.</div>
+    <div class="footer-token">RWG · 786,000,000 · Proof of Play · 100-Year Mining</div>
+    <div class="footer-rwg">PLAY<span>.</span> OWN<span>.</span> EARN<span>.</span></div>
+  </div>
+</footer>
+
+</div><!-- end #main -->
+
+<!-- ================================================================
+     JAVASCRIPT
+================================================================ -->
+<script>
+
+/* ── CURSOR ── */
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.game-card,.cat-card,.deal-card,.wallet-card,.phase-card,.why-icon-item,.pop-step').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));});
+
+/* ── INTRO SEQUENCE ── */
+setTimeout(()=>{
+  const intro=document.getElementById('intro');
+  const main=document.getElementById('main');
+  intro.classList.add('fade-out');
+  setTimeout(()=>{
+    intro.style.display='none';
+    main.classList.add('visible');
+    initScrollReveal();
+  },800);
+},3800);
+
+/* ── MOBILE MENU ── */
+function toggleMenu(){
+  const m=document.getElementById('mobileMenu');
+  const h=document.getElementById('hamburger');
+  const open=m.classList.toggle('open');
+  h.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+/* ── GAMES DATA ── */
+const GAMES = [
+  {title:'GTA V',genre:'Open World',emoji:'🌆',bg:'linear-gradient(135deg,#1a3a2a,#0d1f15)',cats:['openworld','action'],crypto:true,mining:true},
+  {title:'Red Dead 2',genre:'Open World',emoji:'🤠',bg:'linear-gradient(135deg,#3a1f0a,#1a0d05)',cats:['openworld','adventure'],crypto:true,mining:false},
+  {title:'Cyberpunk 2077',genre:'RPG',emoji:'🌃',bg:'linear-gradient(135deg,#0a1a3a,#05102a)',cats:['rpg','action'],crypto:true,mining:true},
+  {title:'PUBG',genre:'Battle Royale',emoji:'🪖',bg:'linear-gradient(135deg,#2a1f0a,#1a1005)',cats:['battle-royale','shooter'],crypto:true,mining:true},
+  {title:'Fortnite',genre:'Battle Royale',emoji:'🏗️',bg:'linear-gradient(135deg,#1a0a3a,#0f0520)',cats:['battle-royale','shooter'],crypto:false,mining:true},
+  {title:'Warzone',genre:'Shooter',emoji:'💥',bg:'linear-gradient(135deg,#1a1a2a,#0d0d1f)',cats:['shooter','action'],crypto:true,mining:true},
+  {title:'Minecraft',genre:'Simulation',emoji:'🧱',bg:'linear-gradient(135deg,#0a2a0a,#052005)',cats:['simulation','openworld'],crypto:false,mining:false},
+  {title:'Forza H5',genre:'Racing',emoji:'🏎️',bg:'linear-gradient(135deg,#2a0a0a,#1f0505)',cats:['racing'],crypto:true,mining:false},
+  {title:'Elden Ring',genre:'RPG',emoji:'💀',bg:'linear-gradient(135deg,#1a1500,#0f0d00)',cats:['rpg','action'],crypto:true,mining:true},
+  {title:"Assassin's Creed",genre:'Action',emoji:'🗡️',bg:'linear-gradient(135deg,#0a1a2a,#051015)',cats:['action','adventure'],crypto:true,mining:false},
+  {title:'Battlefield 2042',genre:'Shooter',emoji:'🪖',bg:'linear-gradient(135deg,#0a1a0a,#051005)',cats:['shooter','action'],crypto:false,mining:false},
+  {title:'Apex Legends',genre:'Battle Royale',emoji:'⚡',bg:'linear-gradient(135deg,#0a1a1a,#051010)',cats:['battle-royale','shooter'],crypto:true,mining:true},
+  {title:'Rocket League',genre:'Sports',emoji:'🚀',bg:'linear-gradient(135deg,#1a0a2a,#100515)',cats:['sports'],crypto:false,mining:false},
+  {title:'The Witcher 3',genre:'RPG',emoji:'🐺',bg:'linear-gradient(135deg,#0a1a0a,#080f08)',cats:['rpg','adventure'],crypto:true,mining:false},
+  {title:'FIFA 24',genre:'Sports',emoji:'⚽',bg:'linear-gradient(135deg,#0a1a0a,#052005)',cats:['sports'],crypto:false,mining:false},
+  {title:'NBA 2K24',genre:'Sports',emoji:'🏀',bg:'linear-gradient(135deg,#1a0a0a,#100505)',cats:['sports'],crypto:false,mining:false},
+  {title:'Gran Turismo 7',genre:'Racing',emoji:'🏁',bg:'linear-gradient(135deg,#0a0a1a,#05050f)',cats:['racing'],crypto:true,mining:false},
+  {title:'Horizon ZD',genre:'Action',emoji:'🦕',bg:'linear-gradient(135deg,#0a1a05,#050f02)',cats:['action','rpg'],crypto:true,mining:true},
+  {title:'Starfield',genre:'RPG',emoji:'🌌',bg:'linear-gradient(135deg,#05051a,#02020f)',cats:['rpg','adventure'],crypto:true,mining:true},
+  {title:'Destiny 2',genre:'Shooter',emoji:'🌙',bg:'linear-gradient(135deg,#050a1a,#02050f)',cats:['shooter','mmorpg'],crypto:true,mining:true},
+  {title:'Far Cry 6',genre:'Action',emoji:'🌴',bg:'linear-gradient(135deg,#0a1a05,#050f02)',cats:['action','openworld'],crypto:false,mining:false},
+  {title:'Watch Dogs',genre:'Action',emoji:'💻',bg:'linear-gradient(135deg,#0a0a1a,#05050f)',cats:['action','openworld'],crypto:true,mining:false},
+  {title:'Ghost Recon',genre:'Shooter',emoji:'👻',bg:'linear-gradient(135deg,#0a1a0a,#051005)',cats:['shooter','action'],crypto:false,mining:false},
+  {title:'Rainbow 6',genre:'Shooter',emoji:'🌈',bg:'linear-gradient(135deg,#1a0505,#0f0202)',cats:['shooter','action'],crypto:true,mining:true},
+  {title:'Valorant',genre:'Shooter',emoji:'🔴',bg:'linear-gradient(135deg,#1a0505,#0f0202)',cats:['shooter','action'],crypto:false,mining:true},
+  {title:'CS 2',genre:'Shooter',emoji:'🔫',bg:'linear-gradient(135deg,#0a1505,#050a02)',cats:['shooter','action'],crypto:true,mining:true},
+  {title:'Overwatch 2',genre:'Shooter',emoji:'🦸',bg:'linear-gradient(135deg,#0a0f1a,#05070f)',cats:['shooter','action'],crypto:false,mining:false},
+  {title:'Dota 2',genre:'MMORPG',emoji:'🐉',bg:'linear-gradient(135deg,#0a050a,#070205)',cats:['mmorpg','strategy'],crypto:true,mining:true},
+  {title:'League of Legends',genre:'MMORPG',emoji:'⚔️',bg:'linear-gradient(135deg,#0a0a05,#070702)',cats:['mmorpg','strategy'],crypto:false,mining:false},
+  {title:'WoW',genre:'MMORPG',emoji:'🧙',bg:'linear-gradient(135deg,#051a1a,#02100f)',cats:['mmorpg','rpg'],crypto:true,mining:true},
+  {title:'ARK Survival',genre:'Simulation',emoji:'🦖',bg:'linear-gradient(135deg,#051a05,#020f02)',cats:['simulation','openworld'],crypto:false,mining:false},
+  {title:'Rust',genre:'Simulation',emoji:'🪓',bg:'linear-gradient(135deg,#1a0505,#0f0202)',cats:['simulation','openworld'],crypto:true,mining:false},
+  {title:'Subnautica',genre:'Adventure',emoji:'🌊',bg:'linear-gradient(135deg,#050f1a,#02060f)',cats:['adventure','simulation'],crypto:false,mining:false},
+  {title:"No Man's Sky",genre:'Adventure',emoji:'🚀',bg:'linear-gradient(135deg,#050a1a,#02050f)',cats:['adventure','openworld'],crypto:true,mining:true},
+  {title:'Cities Skylines',genre:'Strategy',emoji:'🏙️',bg:'linear-gradient(135deg,#0a0a0a,#050505)',cats:['strategy','simulation'],crypto:false,mining:false},
+  {title:'Civilization VI',genre:'Strategy',emoji:'🏛️',bg:'linear-gradient(135deg,#1a1505,#0f0d02)',cats:['strategy'],crypto:false,mining:false},
+  {title:'AoE IV',genre:'Strategy',emoji:'⚔️',bg:'linear-gradient(135deg,#1a0a05,#0f0502)',cats:['strategy'],crypto:false,mining:false},
+  {title:'Total War',genre:'Strategy',emoji:'🛡️',bg:'linear-gradient(135deg,#0a0505,#070202)',cats:['strategy'],crypto:false,mining:false},
+  {title:'Hearts of Iron',genre:'Strategy',emoji:'🗺️',bg:'linear-gradient(135deg,#050505,#020202)',cats:['strategy'],crypto:false,mining:false},
+  {title:'Euro Truck Sim',genre:'Simulation',emoji:'🚛',bg:'linear-gradient(135deg,#0a0f1a,#05070f)',cats:['simulation'],crypto:false,mining:false},
+  {title:'MS Flight Sim',genre:'Simulation',emoji:'✈️',bg:'linear-gradient(135deg,#050f1a,#020709)',cats:['simulation'],crypto:false,mining:false},
+  {title:'Tekken 8',genre:'Fighting',emoji:'🥊',bg:'linear-gradient(135deg,#1a0505,#0f0202)',cats:['fighting','action'],crypto:true,mining:false},
+  {title:'Street Fighter 6',genre:'Fighting',emoji:'🔥',bg:'linear-gradient(135deg,#1a0505,#0f0202)',cats:['fighting','action'],crypto:false,mining:false},
+  {title:'Mortal Kombat 1',genre:'Fighting',emoji:'💀',bg:'linear-gradient(135deg,#1a0000,#0f0000)',cats:['fighting','action'],crypto:true,mining:false},
+];
+
+/* ── BUILD GAME CARDS ── */
+function buildGames(filter='all'){
+  const grid = document.getElementById('gamesGrid');
+  grid.innerHTML = '';
+  const filtered = filter==='all' ? GAMES : GAMES.filter(g=>g.cats.includes(filter));
+  filtered.forEach((g,i)=>{
+    const card = document.createElement('div');
+    card.className = 'game-card reveal';
+    card.style.transitionDelay = (i%8)*0.04+'s';
+    card.innerHTML = `
+      <div class="game-card-bg" style="background:${g.bg};">${g.emoji}</div>
+      <div class="game-card-overlay"></div>
+      <div class="game-card-badges">
+        ${g.crypto?'<span class="badge-crypto">CRYPTO</span>':''}
+        ${g.mining?'<span class="badge-mining">MINING</span>':''}
+      </div>
+      <div class="game-card-body">
+        <div class="game-card-title">${g.title}</div>
+        <div class="game-card-genre">${g.genre}</div>
+      </div>
+      <div class="game-card-glow"></div>
+    `;
+    grid.appendChild(card);
+  });
+  setTimeout(initScrollReveal,50);
+}
+buildGames();
+
+/* ── CATEGORY FILTER ── */
+function filterGames(cat, el) {
+  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('active'));
+  if(el) el.classList.add('active');
+  buildGames(cat);
+}
+
+/* ── CRYPTO DEALS ── */
+const DEALS = [
+  {title:'Cyberpunk 2077',emoji:'🌃',bg:'linear-gradient(135deg,#0a1a3a,#05102a)',orig:'$59',price:'$29',discount:'51%',cryptos:['BTC','ETH','USDT','SOL','RWG']},
+  {title:'Elden Ring',emoji:'💀',bg:'linear-gradient(135deg,#1a1500,#0f0d00)',orig:'$69',price:'$35',discount:'49%',cryptos:['BTC','ETH','RWG']},
+  {title:'GTA V',emoji:'🌆',bg:'linear-gradient(135deg,#1a3a2a,#0d1f15)',orig:'$29',price:'$14',discount:'52%',cryptos:['BTC','USDT','RWG']},
+  {title:'Starfield',emoji:'🌌',bg:'linear-gradient(135deg,#05051a,#02020f)',orig:'$69',price:'$39',discount:'43%',cryptos:['ETH','SOL','RWG']},
+];
+const ctMap = {BTC:'ct-btc',ETH:'ct-eth',USDT:'ct-usdt',SOL:'ct-sol',RWG:'ct-rwg'};
+const grid2 = document.getElementById('dealsGrid');
+DEALS.forEach(d=>{
+  const div = document.createElement('div');
+  div.className='deal-card reveal';
+  div.innerHTML=`
+    <div class="deal-cover" style="background:${d.bg};">
+      <span style="font-size:3.5rem;">${d.emoji}</span>
+      <div class="deal-cover-overlay"></div>
+      <div class="deal-discount">-${d.discount}</div>
+    </div>
+    <div class="deal-body">
+      <div class="deal-title">${d.title}</div>
+      <div class="deal-prices">
+        <span class="deal-original">${d.orig}</span>
+        <span class="deal-price">${d.price}</span>
+      </div>
+      <div class="deal-cryptos">${d.cryptos.map(c=>`<span class="crypto-tag ${ctMap[c]}">${c}</span>`).join('')}</div>
+      <button class="deal-btn">Pay With Crypto</button>
+    </div>
+  `;
+  grid2.appendChild(div);
+});
+
+/* ── COMMUNITY POSTS ── */
+const POSTS = [
+  {avatar:'🎮',color:'#1a0a3a',name:'CryptoRaider_X',game:'PUBG',text:'Won 3 matches in a row today. Mining rate going up! 🔥 Community pool is on fire.',reward:'+4.2 RWG',time:'2 min ago'},
+  {avatar:'👑',color:'#1a1500',name:'ShadowFox99',game:'GTA V',text:"Finished the Diamond Casino heist. Full crew, max payout. That's what teamwork looks like.",reward:'+3.8 RWG',time:'8 min ago'},
+  {avatar:'⚡',color:'#0a1a3a',name:'NovaBlade',game:'Forza Horizon',text:'New top speed record on the motorway — 423km/h. RWG mining bonus activated for speed records!',reward:'+2.1 RWG',time:'15 min ago'},
+  {avatar:'🌟',color:'#0a1a0a',name:'AceHunter',game:'Valorant',text:'Hit Radiant rank this season. Skill multiplier is now 2.1x. Grinding for that bonus block.',reward:'+5.4 RWG',time:'22 min ago'},
+  {avatar:'🏎️',color:'#1a0505',name:'SpeedDemon',game:'Warzone',text:'20 kill game, solo. New personal record. The mining rewards from this session alone paid for my store purchase.',reward:'+6.1 RWG',time:'35 min ago'},
+  {avatar:'🐉',color:'#050a1a',name:'DragonSlyr',game:'Elden Ring',text:'Cleared the final boss DLC no hit run. This is what skill-based rewards should always feel like.',reward:'+4.7 RWG',time:'1 hr ago'},
+];
+const cp = document.getElementById('communityPosts');
+POSTS.forEach(p=>{
+  const div=document.createElement('div');
+  div.className='community-post reveal';
+  div.innerHTML=`
+    <div class="cp-header">
+      <div class="cp-avatar" style="background:${p.color};">${p.avatar}</div>
+      <div>
+        <div class="cp-name">${p.name}</div>
+        <div class="cp-game">${p.game}</div>
+      </div>
+    </div>
+    <div class="cp-text">${p.text}</div>
+    <div class="cp-footer">
+      <div class="cp-reward">${p.reward}</div>
+      <div class="cp-time">${p.time}</div>
+    </div>
+  `;
+  cp.appendChild(div);
+});
+
+/* ── SCROLL REVEAL ── */
+function initScrollReveal(){
+  const els=document.querySelectorAll('.reveal:not(.in)');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');obs.unobserve(e.target);}});
+  },{threshold:.08,rootMargin:'0px 0px -20px 0px'});
+  els.forEach(el=>obs.observe(el));
+}
+
+/* ── FILTER CHIPS ── */
+document.querySelectorAll('.filter-chip').forEach(chip=>{
+  chip.addEventListener('click',function(){
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+
+/* ── NAV STICKY GLOW ON SCROLL ── */
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('mainNav');
+  if(window.scrollY>60){nav.style.borderBottomColor='rgba(255,30,30,.3)';}
+  else{nav.style.borderBottomColor='rgba(255,30,30,.15)';}
+});
+
+</script>
+</body>
+</html>
